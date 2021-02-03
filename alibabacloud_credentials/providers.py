@@ -3,6 +3,7 @@ import json
 import time
 import ConfigParser
 import calendar
+import os
 
 from Tea.vendored import requests
 from Tea.core import TeaCore
@@ -244,7 +245,9 @@ class ProfileCredentialsProvider(AlibabaCloudCredentialsProvider):
     def get_credentials(self):
         file_path = self.file_path if self.file_path else au.environment_credentials_file
         if file_path is None:
-            file_path = ac.DEFAULT_CREDENTIALS_FILE_PATH
+            if not ac.HOME:
+                return
+            file_path = os.path.join(ac.HOME, "/.alibabacloud/credentials.ini")
         if len(file_path) == 0:
             raise CredentialException("The specified credentials file is empty")
 
