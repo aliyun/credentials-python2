@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import json
 import time
-import ConfigParser
 import calendar
 import os
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 
 from Tea.vendored import requests
 from Tea.core import TeaCore
@@ -252,7 +255,7 @@ class ProfileCredentialsProvider(AlibabaCloudCredentialsProvider):
             raise CredentialException("The specified credentials file is empty")
 
         # loads ini
-        conf = ConfigParser.ConfigParser()
+        conf = ConfigParser()
         conf.read(file_path)
         ini_map = dict(conf._sections)
         for k in dict(conf._sections):
