@@ -1,4 +1,7 @@
-from urllib import quote_plus, urlencode
+try:
+    from urllib import quote_plus, urlencode
+except ImportError:
+    from urllib.parse import quote_plus, urlencode
 
 import hmac
 import hashlib
