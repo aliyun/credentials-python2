@@ -1,3 +1,6 @@
+### 2020-03-01 Version 0.0.3
+* Compatible version for python2/3.
+
 ### 2020-02-03 Version 0.0.2
 * Optimize the way to obtain the credentials.ini file.
 
