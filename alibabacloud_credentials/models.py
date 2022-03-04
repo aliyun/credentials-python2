@@ -8,9 +8,11 @@ class Config(TeaModel):
     """
     Model for initing credential
     """
+
     def __init__(self, access_key_id='', access_key_secret='', security_token='', bearer_token='',
-                 duration_seconds=3600, role_arn='', policy='', role_session_expiration=3600, role_session_name='',
-                 public_key_id='', private_key_file='', role_name='', type='', host='', timeout=1000,
+                 duration_seconds=3600, role_arn='', oidc_provider_arn='', oidc_token_file_path='',
+                 policy='', role_session_expiration=3600, role_session_name='', public_key_id='',
+                 private_key_file='', role_name='', type='', host='', timeout=1000,
                  connect_timeout=1000, proxy=''):
         # accesskey id
         self.access_key_id = TeaConverter.to_unicode(access_key_id)  # type: unicode
@@ -24,6 +26,10 @@ class Config(TeaModel):
         self.duration_seconds = duration_seconds  # type: int
         # role arn
         self.role_arn = TeaConverter.to_unicode(role_arn)  # type: unicode
+        # role arn
+        self.oidc_provider_arn = TeaConverter.to_unicode(oidc_provider_arn)  # type: unicode
+        # role arn
+        self.oidc_token_file_path = TeaConverter.to_unicode(oidc_token_file_path)  # type: unicode
         # policy
         self.policy = TeaConverter.to_unicode(policy)  # type: unicode
         # role session expiration
@@ -60,6 +66,10 @@ class Config(TeaModel):
             result['durationSeconds'] = self.duration_seconds
         if self.role_arn is not None:
             result['roleArn'] = self.role_arn
+        if self.oidc_provider_arn is not None:
+            result['oidcProviderArn'] = self.oidc_provider_arn
+        if self.oidc_token_file_path is not None:
+            result['oidcTokenFilePath'] = self.oidc_token_file_path
         if self.policy is not None:
             result['policy'] = self.policy
         if self.role_session_expiration is not None:
@@ -98,6 +108,10 @@ class Config(TeaModel):
             self.duration_seconds = m.get('durationSeconds')
         if m.get('roleArn') is not None:
             self.role_arn = m.get('roleArn')
+        if m.get('oidcProviderArn') is not None:
+            self.oidc_provider_arn = m.get('oidcProviderArn')
+        if m.get('oidcTokenFilePath') is not None:
+            self.oidc_token_file_path = m.get('oidcTokenFilePath')
         if m.get('policy') is not None:
             self.policy = m.get('policy')
         if m.get('roleSessionExpiration') is not None:
@@ -121,5 +135,3 @@ class Config(TeaModel):
         if m.get('proxy') is not None:
             self.proxy = m.get('proxy')
         return self
-
-

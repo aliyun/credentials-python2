@@ -15,11 +15,16 @@ class TestCredentials(unittest.TestCase):
             return credentials.RamRoleArnCredential("accessKeyId", "accessKeySecret", "securityToken", 100000000000,
                                                     None)
 
+    class TestOIDCRoleArnProvider:
+        def get_credentials(self):
+            return credentials.OIDCRoleArnCredential("accessKeyId", "accessKeySecret", "securityToken", 100000000000,
+                                                     None)
+
     class TestRsaKeyPairProvider:
         def get_credentials(self):
             return credentials.RsaKeyPairCredential("accessKeyId", "accessKeySecret", 100000000000,
                                                     None)
-    
+
     def test_EcsRamRoleCredential(self):
         provider = providers.EcsRamRoleCredentialProvider("roleName")
         access_key_id = 'access_key_id'
@@ -109,6 +114,44 @@ class TestCredentials(unittest.TestCase):
         cred._refresh_credential()
         self.assertIsNotNone(cred)
 
+    def test_OIDCRoleArnCredential(self):
+        access_key_id, access_key_secret, security_token, expiration = \
+            'access_key_id', 'access_key_secret', 'security_token', 640900000000
+        provider = self.TestOIDCRoleArnProvider()
+        cred = credentials.OIDCRoleArnCredential(
+            access_key_id, access_key_secret, security_token, expiration, provider
+        )
+
+        self.assertEqual('access_key_id', cred.access_key_id)
+        self.assertEqual('access_key_secret', cred.access_key_secret)
+        self.assertEqual('security_token', cred.security_token)
+        self.assertEqual(640900000000, cred.expiration)
+
+        access_key_id, access_key_secret, security_token, expiration = \
+            'access_key_id', 'access_key_secret', 'security_token', 6409
+        provider = self.TestOIDCRoleArnProvider()
+        cred = credentials.OIDCRoleArnCredential(
+            access_key_id, access_key_secret, security_token, expiration, provider
+        )
+
+        # refresh token
+        self.assertTrue(cred._with_should_refresh())
+
+        self.assertEqual('accessKeyId', cred.get_access_key_id())
+        self.assertEqual('accessKeySecret', cred.access_key_secret)
+        self.assertEqual('securityToken', cred.security_token)
+        self.assertEqual(100000000000, cred.expiration)
+        self.assertEqual('oidc_role_arn', cred.credential_type)
+        self.assertIsInstance(cred.provider, self.TestOIDCRoleArnProvider)
+
+        self.assertFalse(cred._with_should_refresh())
+
+        g = cred._get_new_credential()
+        self.assertIsNotNone(g)
+
+        cred._refresh_credential()
+        self.assertIsNotNone(cred)
+
     def test_RsaKeyPairCredential(self):
         access_key_id, access_key_secret, expiration = 'access_key_id', 'access_key_secret', 90000000000
         provider = providers.RsaKeyPairCredentialProvider(access_key_id, access_key_secret)
@@ -134,7 +177,7 @@ class TestCredentials(unittest.TestCase):
         self.assertEqual(100000000000, cred.expiration)
 
     def test_StsCredential(self):
-        access_key_id, access_key_secret, security_token =\
+        access_key_id, access_key_secret, security_token = \
             'access_key_id', 'access_key_secret', 'security_token'
         cred = credentials.StsCredential(
             access_key_id, access_key_secret, security_token

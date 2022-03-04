@@ -58,7 +58,8 @@ class TestProviders(unittest.TestCase):
         self.assertIsNotNone(prov.role_name)
         prov.role_name = 'role_name'
         prov._set_credential_url()
-        self.assertEqual('http://100.100.100.200/latest/meta-data/ram/security-credentials/role_name', prov.credential_url)
+        self.assertEqual('http://100.100.100.200/latest/meta-data/ram/security-credentials/role_name',
+                         prov.credential_url)
 
     def test_DefaultCredentialsProvider(self):
         prov = providers.DefaultCredentialsProvider()
@@ -116,6 +117,43 @@ class TestProviders(unittest.TestCase):
         self.assertEqual('access_key_secret', prov.access_key_secret)
         self.assertEqual('role_session_name', prov.role_session_name)
         self.assertEqual('role_arn', prov.role_arn)
+        self.assertEqual('cn-hangzhou', prov.region_id)
+        self.assertIsNone(prov.policy)
+
+        cred = prov._create_credentials(turl='http://127.0.0.1:8888')
+        self.assertEqual('AccessKeyId', cred.access_key_id)
+
+    def test_OIDCRoleArnCredentialProvider(self):
+        access_key_id, access_key_secret, role_session_name, role_arn, oidc_provider_arn, oidc_token_file_path, region_id, policy = \
+            'access_key_id', 'access_key_secret', 'role_session_name', 'role_arn', 'oidc_provider_arn', 'tests/private_key.txt', 'region_id', 'policy'
+        prov = providers.OIDCRoleArnCredentialProvider(
+            access_key_id, access_key_secret, role_session_name, role_arn, oidc_provider_arn, oidc_token_file_path,
+            region_id, policy
+        )
+        self.assertEqual('access_key_id', prov.access_key_id)
+        self.assertEqual('access_key_secret', prov.access_key_secret)
+        self.assertEqual('role_session_name', prov.role_session_name)
+        self.assertEqual('role_arn', prov.role_arn)
+        self.assertEqual('oidc_provider_arn', prov.oidc_provider_arn)
+        self.assertEqual('tests/private_key.txt', prov.oidc_token_file_path)
+        self.assertEqual('region_id', prov.region_id)
+        self.assertEqual('policy', prov.policy)
+
+        conf = models.Config(
+            access_key_id=access_key_id,
+            access_key_secret=access_key_secret,
+            role_session_name=role_session_name,
+            role_arn=role_arn,
+            oidc_provider_arn=oidc_provider_arn,
+            oidc_token_file_path=oidc_token_file_path
+        )
+        prov = providers.OIDCRoleArnCredentialProvider(config=conf)
+        self.assertEqual('access_key_id', prov.access_key_id)
+        self.assertEqual('access_key_secret', prov.access_key_secret)
+        self.assertEqual('role_session_name', prov.role_session_name)
+        self.assertEqual('role_arn', prov.role_arn)
+        self.assertEqual('oidc_provider_arn', prov.oidc_provider_arn)
+        self.assertEqual('tests/private_key.txt', prov.oidc_token_file_path)
         self.assertEqual('cn-hangzhou', prov.region_id)
         self.assertIsNone(prov.policy)
 
@@ -189,6 +227,3 @@ class TestProviders(unittest.TestCase):
         auth_util.environment_access_key_id = 'a'
         auth_util.environment_access_key_secret = ''
         self.assertRaises(exceptions.CredentialException, prov.get_credentials)
-
-
-
