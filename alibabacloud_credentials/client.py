@@ -44,6 +44,8 @@ class Client(object):
             return providers.RamRoleArnCredentialProvider(config=config)
         elif config.type == ac.RSA_KEY_PAIR:
             return providers.RsaKeyPairCredentialProvider(config=config)
+        elif config.type == ac.OIDC_ROLE_ARN:
+            return providers.OIDCRoleArnCredentialProvider(config=config)
         return providers.DefaultCredentialsProvider()
 
     @attribute_error_return_none
