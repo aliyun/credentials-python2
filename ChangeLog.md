@@ -1,3 +1,7 @@
+### 2022-10-13 Version 0.1.0
+* Support oidc credentials.
+* Fix ram credentials.
+
 ### 2020-03-01 Version 0.0.3
 * Compatible version for python2/3.
 
