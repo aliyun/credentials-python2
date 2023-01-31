@@ -6,6 +6,7 @@ from alibabacloud_credentials.utils import auth_constant
 from alibabacloud_credentials.client import Client
 from alibabacloud_credentials import credentials
 from alibabacloud_credentials import providers
+from alibabacloud_credentials.utils import auth_util
 
 
 class TestClient(unittest.TestCase):
@@ -19,11 +20,14 @@ class TestClient(unittest.TestCase):
         self.assertEqual('654321', cred.get_access_key_secret())
         self.assertEqual(auth_constant.ACCESS_KEY, cred.get_type())
         self.assertIsNone(cred.get_security_token())
+        enable_oidc_credential = auth_util.enable_oidc_credential
+        auth_util.enable_oidc_credential = False
         try:
             cred = Client()
             cred.get_access_key_id()
         except Exception as e:
             self.assertEqual(e.message, 'not found credentials')
+        auth_util.enable_oidc_credential = enable_oidc_credential
 
         conf = Config(type='sts')
         cred = Client(conf)
